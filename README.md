@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 本项目为[nideshop_server_full](https://github.com/saonian/nideshop_server_full)的管理界面，采用VUE+Element UI开发，目前大部分功能都开发完毕。
 
 免费共享，后续不再更新。
@@ -26,3 +27,7 @@
 ![](screenshot/3.png)
 
 ![](screenshot/4.png)
+=======
+# myshop-admin
+myshop后台程序
+>>>>>>> efa3fe0c51790b553aa9327491878d7a73f9ffd0
