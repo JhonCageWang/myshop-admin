@@ -10,8 +10,8 @@
     <el-table :data="couriers" stripe border v-loading="tbloading">
       <el-table-column type="index" width="50" align="center"></el-table-column>
       <el-table-column prop="name" label="快递名称" width="150" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="code" label="快递鸟编码" width="150" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="sort_order" label="排序" min-width="80" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="code" label="快递编码(apiSpace)" width="150" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="sortOrder" label="排序" min-width="80" show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="220">
         <template slot-scope="scope">
           <router-link :to="{ path: '/couriers/edit/' + scope.row.id }">
@@ -59,10 +59,10 @@ export default {
       if (search) {
         this.page.page = 1
       }
-      this.$http.get(api.COURIER + `?page=${this.page.page}&size=${this.page.size}&name=${this.keywords}`).then(data => {
-        if (data.errno === 0) {
-          this.couriers = data.data.data
-          this.page.total = data.data.count
+      this.$http.get(api.COURIER + `/list?page=${this.page.page}&size=${this.page.size}&name=${this.keywords}`).then(data => {
+        if (data.code === 0) {
+          this.couriers = data.data.list
+          this.page.total = data.data.total
         }
         this.tbloading = false
       })

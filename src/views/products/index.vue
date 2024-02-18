@@ -9,30 +9,30 @@
     </el-row>
     <el-table :data="products" stripe border v-loading="tbloading">
       <el-table-column type="index" width="50" align="center"></el-table-column>
-      <el-table-column prop="cat_name" label="商品分类" min-width="100" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="catName" label="商品分类" min-width="100" show-overflow-tooltip></el-table-column>
       <el-table-column prop="name" label="商品名称" width="360" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="goods_sn" label="SKU" width="80"></el-table-column>
-      <el-table-column prop="retail_price" label="零售价" align="right" width="80"></el-table-column>
-      <el-table-column prop="sell_volume" label="销量" align="right" width="80"></el-table-column>
-      <el-table-column prop="is_new" label="新品" align="center" width="65">
+      <el-table-column prop="goodsSn" label="SKU" width="80"></el-table-column>
+      <el-table-column prop="retailPrice" label="零售价" align="right" width="80"></el-table-column>
+      <el-table-column prop="sellVolume" label="销量" align="right" width="80"></el-table-column>
+      <el-table-column prop="isNew" label="新品" align="center" width="65">
         <template slot-scope="scope">
-          <el-tag type="success" size="small" v-if="scope.row.is_new === 1">是</el-tag>
-          <el-tag type="danger" size="small" v-if="scope.row.is_new === 0">否</el-tag>
+          <el-tag type="success" size="small" v-if="scope.row.isNew === 1">是</el-tag>
+          <el-tag type="danger" size="small" v-if="scope.row.isNew === 0">否</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="is_on_sale" label="在售" align="center" width="65">
+      <el-table-column prop="isOnSale" label="在售" align="center" width="65">
         <template slot-scope="scope">
-          <el-tag type="success" size="small" v-if="scope.row.is_on_sale === 1">是</el-tag>
-          <el-tag type="danger" size="small" v-if="scope.row.is_on_sale === 0">否</el-tag>
+          <el-tag type="success" size="small" v-if="scope.row.isOnSale === 1">是</el-tag>
+          <el-tag type="danger" size="small" v-if="scope.row.isOnSale === 0">否</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="need_express" label="物流" align="center" width="65">
+      <el-table-column prop="needExpress" label="物流" align="center" width="65">
         <template slot-scope="scope">
-          <el-tag type="success" size="small" v-if="scope.row.need_express === 1">是</el-tag>
-          <el-tag type="danger" size="small" v-if="scope.row.need_express === 0">否</el-tag>
+          <el-tag type="success" size="small" v-if="scope.row.needExpress === 1">是</el-tag>
+          <el-tag type="danger" size="small" v-if="scope.row.needExpress === 0">否</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="add_time" label="创建日期" width="155" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="addTime" label="创建日期" width="155" show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="175">
         <template slot-scope="scope">
           <router-link :to="{ path: '/products/edit/' + scope.row.id }">
@@ -80,9 +80,9 @@ export default {
       if (search) {
         this.page.page = 1
       }
-      this.$http.get(api.GOODS + `?page=${this.page.page}&size=${this.page.size}&name=${this.keywords}`).then(data => {
-        this.products = data.data.data
-        this.page.total = data.data.count
+      this.$http.get(api.GOODS + `/list/?page=${this.page.page}&size=${this.page.size}&keyword=${this.keywords}`).then(data => {
+        this.products = data.data.list
+        this.page.total = data.data.total
         this.tbloading = false
       }).catch(err => {
         this.tbloading = false

@@ -1,5 +1,5 @@
 'use strict'
-// Template version: 1.3.1
+// Template version: 1.3.1  http://127.0.0.1:8360 https://www.itsforher.top
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
@@ -11,11 +11,11 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'http://www.nideshop.me',
+        target: 'http://127.0.0.1:8080',
         changeOrigin: true,
-        pathRewrite: {
-          '^/api': ''
-        }
+        // pathRewrite: {
+        //   '^/api': ''
+        // }
       }
     },
 

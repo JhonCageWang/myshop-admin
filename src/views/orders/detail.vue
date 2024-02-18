@@ -6,45 +6,45 @@
       </div>
       <el-form label-position="left" label-width="90px">
         <el-form-item label="头像" class="iteminfo">
-          <img :src="order.user.avatar" width="70" height="70" />
+          <img :src="user.avatar" width="70" height="70" />
         </el-form-item>
         <el-form-item label="客户" class="iteminfo">
-          <span>{{ order.user.nickname }}</span>
+          <span>{{ user.nickname }}</span>
         </el-form-item>
         <el-form-item label="注册日期" class="iteminfo">
-          <span>{{ order.user.add_time }}</span>
+          <span>{{ user.registerTime }}</span>
         </el-form-item>
       </el-form>
     </el-card>
     <el-card style="margin-top: 10px">
       <div slot="header">
-        <span><i class="el-icon-fa-info">&nbsp;&nbsp;</i>订单信息({{ order.reference }})</span>
+        <span><i class="el-icon-fa-info">&nbsp;&nbsp;</i>订单信息({{ order.id }})</span>
       </div>
       <el-table :data="orders" stripe border>
-        <el-table-column prop="order_sn" label="订单号" min-width="150" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="orderSn" label="订单号" min-width="150" show-overflow-tooltip></el-table-column>
         <el-table-column prop="payment" label="支付方式" width="80" show-overflow-tooltip>
           <template slot-scope="scope">
             微信支付
           </template>
         </el-table-column>
-        <el-table-column prop="order_price" label="订单金额" width="80" align="right" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="actual_price" label="实付款" width="80" align="right" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="express.shipper_name" v-if="order.order_status > 300" label="物流" width="120" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="express.logistic_code" v-if="order.order_status > 300" label="运单号" width="100" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="order_status" label="状态" align="center" width="80">
+        <el-table-column prop="orderPrice" label="订单金额" width="80" align="right" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="actualPrice" label="实付款" width="80" align="right" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="orderExpress.shipperName" v-if="order.orderStatus >= 300" label="物流" width="120" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="orderExpress.logisticCode" v-if="order.orderStatus >= 300" label="运单号" width="100" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="orderStatus" label="状态" align="center" width="80">
           <template slot-scope="scope">
-            <el-tag size="small" v-if="scope.row.order_status === 0">未付款</el-tag>
-            <el-tag type="warning" size="small" v-if="scope.row.order_status === 101">已取消</el-tag>
-            <el-tag type="danger" size="small" v-if="scope.row.order_status === 102">已删除</el-tag>
-            <el-tag type="success" size="small" v-if="scope.row.order_status === 201">已付款</el-tag>
-            <el-tag type="info" size="small" v-if="scope.row.order_status === 300">已发货</el-tag>
-            <el-tag type="info" size="small" v-if="scope.row.order_status === 301">待评价</el-tag>
+            <el-tag size="small" v-if="scope.row.orderStatus === 0">未付款</el-tag>
+            <el-tag type="warning" size="small" v-if="scope.row.orderStatus === 101">已取消</el-tag>
+            <el-tag type="danger" size="small" v-if="scope.row.orderStatus === 102">已删除</el-tag>
+            <el-tag type="success" size="small" v-if="scope.row.orderStatus === 201">已付款</el-tag>
+            <el-tag type="info" size="small" v-if="scope.row.orderStatus === 300">已发货</el-tag>
+            <el-tag type="info" size="small" v-if="scope.row.orderStatus === 301">待评价</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="add_time" label="创建日期" width="170" show-overflow-tooltip></el-table-column>
-        <el-table-column label="操作" width="120" v-if="order.order_status === 201">
+        <el-table-column prop="addTime" label="创建日期" width="170" show-overflow-tooltip></el-table-column>
+        <el-table-column label="操作" width="120" v-if="order.orderStatus === 201  || order.orderStatus === 300">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" icon="el-icon-fa-cube" @click="dialogDelivery = true" v-if="scope.row.order_status === 201">发货</el-button>
+            <el-button type="primary" size="mini" icon="el-icon-fa-cube" @click="dialogDelivery = true" v-if="scope.row.orderStatus === 201  || scope.row.orderStatus === 300"  >发货</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -59,24 +59,23 @@
             <img width="100" height="100" :src="scope.row.list_pic_url"/>
           </template>
         </el-table-column>
-        <el-table-column prop="goods_name" label="商品名称" min-width="150" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="goods_specifition_name_value" label="规格" min-width="150" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="goods_sn" label="SKU" width="100" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="retail_price" label="商品价格" width="100" align="right" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="number" label="数量" width="80" align="right" show-overflow-tooltip>
-        </el-table-column>
+        <el-table-column prop="goodsName" label="商品名称" min-width="150" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="goodsSpecificationNameValue" label="规格" min-width="150" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="goodsSn" label="SKU" width="100" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="retailPrice" label="商品价格" width="100" align="right" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="number" label="数量" width="80" align="right" show-overflow-tooltip></el-table-column>
       </el-table>
     </el-card>
     <el-card style="margin: 10px 0">
       <div slot="header">
         <span><i class="el-icon-fa-truck">&nbsp;&nbsp;</i>收件人</span>
       </div>
-      <el-table :data="orders" stripe border>
-        <el-table-column prop="consignee" label="收件人" width="80" show-overflow-tooltip></el-table-column>
+      <el-table :data="addresses" stripe border>
+        <el-table-column prop="name" label="收件人" width="80" show-overflow-tooltip></el-table-column>
         <el-table-column prop="mobile" label="联系方式" width="120" align="right" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="province" label="省" width="80" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="city" label="市" width="80" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="district" label="地址" min-width="150" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="provinceName" label="省" width="80" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="cityName" label="市" width="80" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="districtName" label="地址" min-width="150" show-overflow-tooltip></el-table-column>
         <el-table-column prop="address" label="地址" min-width="150" show-overflow-tooltip></el-table-column>
       </el-table>
     </el-card>
@@ -100,13 +99,13 @@
       :visible.sync="dialogDelivery"
       width="30%">
       <el-form ref="formDelivery" :model="formDelivery" label-width="80px" size="small">
-        <el-form-item label="快递" prop="courier_id" :rules="{required: true, message: '请选择发货快递'}">
-          <el-select v-model="formDelivery.courier_id" placeholder="请选择">
+        <el-form-item label="快递" prop="courierId" :rules="{required: true, message: '请选择发货快递'}">
+          <el-select v-model="formDelivery.courierId" placeholder="请选择">
             <el-option v-for="item in couriers" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="单号" prop="courier_no" :rules="{required: true, message: '请输入快递单号'}">
-          <el-input v-model="formDelivery.courier_no"></el-input>
+        <el-form-item label="单号" prop="courierNo" :rules="{required: true, message: '请输入快递单号'}">
+          <el-input v-model="formDelivery.courierNo"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -126,16 +125,18 @@ export default {
     return {
       id: null,
       order: {},
+      user: {},
       orders: [],
       goods: [],
       addresses: [],
+      orderExpress: {},
       invoices: [],
       dialogDelivery: false,
       loading: false,
       couriers: [],
       formDelivery: {
-        courier_id: null,
-        courier_no: ''
+        courierId: null,
+        courierNo: ''
       }
     }
   },
@@ -147,17 +148,21 @@ export default {
   methods: {
     getOrdersInfo () {
       this.$http.get(api.ORDER + '/info?id=' + this.id).then(data => {
+        console.log(data)
         this.order = data.data
-        this.orders = [this.order]
-        this.goods = this.order.goods
-        this.goods.forEach(item => {
-          item.cover = /^http/i.test(item.list_list_pic_url) ? item.list_list_pic_url : api.QiniuDomain + item.list_list_pic_url
-        })
+        this.orders = [data.data]
+        this.goods = data.data.goodsList
+        this.addresses = [data.data.address]
+        this.orderExpress = data.data.orderExpress
+        this.user = data.data.user
+        this.formDelivery.courierId = data.data.orderExpress.shipperId
+        this.formDelivery.courierNo = data.data.orderExpress.logisticCode
       })
     },
     getCouriersList () {
-      this.$http.get(api.COURIER + '?page=1&size=1000').then(data => {
+      this.$http.get(api.COURIER + '/list?page=1&size=1000').then(data => {
         this.couriers = data.data
+        console.log(this.couriers)
       })
     },
     delivery () {

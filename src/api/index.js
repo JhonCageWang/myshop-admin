@@ -1,7 +1,7 @@
 export const CONTEXT = '/api/admin'
 
 // 七牛域名，结尾带斜杠
-export const QiniuDomain = 'http://domain/'
+export const QiniuDomain = 'http://img.itsforher.top/'
 // 上传到七牛的商品评论图片名前缀，结尾带斜杠
 export const GoodsCommentImgPrefix = 'comments/goods/'
 // 上传到七牛的主题评论图片名前缀，结尾带斜杠
@@ -21,10 +21,10 @@ export const AdImgPrefix = 'ads/'
 // 上传到七牛的专题图片名前缀，结尾带斜杠
 export const TopicImgPrefix = 'topic/'
 
-export const LOGIN = CONTEXT + '/auth/login'
+export const LOGIN = CONTEXT + '/login'
 export const LOGIN_USER = CONTEXT + '/login/user'
 export const LOGOUT = CONTEXT + '/auth/logout'
-export const UP_TOKEN = CONTEXT + '/index/uptoken'
+export const UP_TOKEN = CONTEXT + '/qiniu/uptoken'
 export const GOODS = CONTEXT + '/goods'
 export const SPECIFICATION = CONTEXT + '/specification'
 export const CATEGORY = CONTEXT + '/category'

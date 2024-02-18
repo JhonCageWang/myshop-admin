@@ -10,21 +10,21 @@
     <el-table :data="brands" stripe border v-loading="tbloading">
       <el-table-column type="index" width="50" align="center"></el-table-column>
       <el-table-column prop="name" label="品牌名称" min-width="150" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="floor_price" label="起步价" align="right" width="80" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="is_new" label="首页显示" align="center" width="100">
+      <el-table-column prop="floorPrice" label="起步价" align="right" width="80" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="isNew" label="首页显示" align="center" width="100">
         <template slot-scope="scope">
-          <el-tag type="success" size="small" v-if="scope.row.is_new === 1">是</el-tag>
-          <el-tag type="danger" size="small" v-if="scope.row.is_new === 0">否</el-tag>
+          <el-tag type="success" size="small" v-if="scope.row.isNew === 1">是</el-tag>
+          <el-tag type="danger" size="small" v-if="scope.row.isNew === 0">否</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="is_show" label="是否显示" align="center" width="100">
         <template slot-scope="scope">
-          <el-tag type="success" size="small" v-if="scope.row.is_new === 1">是</el-tag>
-          <el-tag type="danger" size="small" v-if="scope.row.is_new === 0">否</el-tag>
+          <el-tag type="success" size="small" v-if="scope.row.isNew === 1">是</el-tag>
+          <el-tag type="danger" size="small" v-if="scope.row.isNew === 0">否</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="sort_order" label="列表排序" align="right" width="80" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="home_sort_order" label="首页排序" align="right" width="80" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="sortOrder" label="列表排序" align="right" width="80" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="homeSortOrder" label="首页排序" align="right" width="80" show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
           <router-link :to="{ path: '/brands/edit/' + scope.row.id }">
@@ -78,9 +78,9 @@ export default {
       if (search) {
         this.page.page = 1
       }
-      this.$http.get(api.BRAND + `?page=${this.page.page}&size=${this.page.size}&name=${this.keywords}`).then(data => {
-        this.brands = data.data.data
-        this.page.total = data.data.count
+      this.$http.get(api.BRAND + `/index?page=${this.page.page}&size=${this.page.size}&name=${this.keywords}`).then(data => {
+        this.brands = data.data.list
+        this.page.total = data.data.total
         this.tbloading = false
       }).catch(err => {
         this.$message.error(err + '')

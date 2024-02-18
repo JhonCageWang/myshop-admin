@@ -31,11 +31,11 @@
               <el-form-item label="分类名称" prop="name" :rules="{required: true, message: '请输入分类名称'}">
                 <el-input v-model="form.name" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="显示名称" prop="front_name" :rules="{required: true, message: '请输入显示名称'}">
-                <el-input v-model="form.front_name" auto-complete="off"></el-input>
+              <el-form-item label="显示名称" prop="frontName" :rules="{required: true, message: '请输入显示名称'}">
+                <el-input v-model="form.frontName" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item label="显示描述">
-                <el-input type="textarea" :rows="2" v-model="form.front_desc" auto-complete="off"></el-input>
+                <el-input type="textarea" :rows="2" v-model="form.frontDesc" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item class="no-line-height" label="图标" v-show="catType === 0">
                 <croppa v-model="iconCroppa"
@@ -57,7 +57,7 @@
                   @image-remove="onIconRemove">
                 </croppa>
               </el-form-item>
-              <el-form-item class="no-line-height" label="横幅" prop="wap_banner_url" :rules="{required: true, validator: bannerValidate}">
+              <el-form-item class="no-line-height" label="横幅" prop="wapBannerUrl" :rules="{required: true, validator: bannerValidate}">
                 <croppa v-model="bannerCroppa"
                   :width="375"
                   :height="123"
@@ -78,18 +78,18 @@
                 </croppa>
               </el-form-item>
               <el-form-item label="首页显示" v-show="catType === 0">
-                <el-radio class="radio" v-model="form.show_index" :label="1">是</el-radio>
-                <el-radio class="radio" v-model="form.show_index" :label="0">否</el-radio>
+                <el-radio class="radio" v-model="form.showIndex" :label="1">是</el-radio>
+                <el-radio class="radio" v-model="form.showIndex" :label="0">否</el-radio>
               </el-form-item>
               <el-form-item label="排序">
-                <el-input-number v-model="form.sort_order" :min="1" :max="1000"></el-input-number>
+                <el-input-number v-model="form.sortOrder" :min="1" :max="1000"></el-input-number>
               </el-form-item>
               <el-form-item label="首页排序" v-show="catType === 0">
-                <el-input-number v-model="form.index_sort_order" :min="1" :max="1000"></el-input-number>
+                <el-input-number v-model="form.indexSortOrder" :min="1" :max="1000"></el-input-number>
               </el-form-item>
               <el-form-item label="状态">
-                <el-radio class="radio" v-model="form.is_show" :label="1">启用</el-radio>
-                <el-radio class="radio" v-model="form.is_show" :label="0">禁用</el-radio>
+                <el-radio class="radio" v-model="form.isShow" :label="1">启用</el-radio>
+                <el-radio class="radio" v-model="form.isShow" :label="0">禁用</el-radio>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="save" :loading="loading">{{ form.id ? '修改' : '新增' }}</el-button>
@@ -131,17 +131,17 @@ export default {
       form: {
         id: null,
         name: '',
-        front_name: '',
+        frontName: '',
         type: 0,
-        front_desc: '',
+        frontDesc: '',
         parent: [],
-        is_show: 1,
+        isShow: 1,
         children: [],
-        sort_order: 50,
-        index_sort_order: 5,
-        icon_url: '',
-        wap_banner_url: '',
-        show_index: 0
+        sortOrder: 50,
+        indexSortOrder: 5,
+        iconUrl: '',
+        wapBannerUrl: '',
+        showIndex: 0
       },
       props: {
         label: 'name',
@@ -159,10 +159,10 @@ export default {
   },
   computed: {
     iconUrl: function () {
-      return this.form.icon_url && !/^http/i.test(this.form.icon_url) ? api.QiniuDomain + this.form.icon_url : this.form.icon_url
+      return this.form.iconUrl && !/^http/i.test(this.form.iconUrl) ? api.QiniuDomain + this.form.iconUrl : this.form.iconUrl
     },
     wapBannerUrl: function () {
-      return this.form.wap_banner_url && !/^http/i.test(this.form.wap_banner_url) ? api.QiniuDomain + this.form.wap_banner_url : this.form.wap_banner_url
+      return this.form.wapBannerUrl && !/^http/i.test(this.form.wapBannerUrl) ? api.QiniuDomain + this.form.wapBannerUrl : this.form.wapBannerUrl
     }
   },
   mounted () {
@@ -172,7 +172,7 @@ export default {
     getCategoriesList (type = 0) {
       this.loading2 = true
       this.catType = type
-      this.$http.get(api.CATEGORY + '?type=' + type).then(data => {
+      this.$http.get(api.CATEGORY + '/index?type=' + type).then(data => {
         this.categories = data.data
         this.convert(this.categories, this.categories2)
         this.loading2 = false
@@ -189,13 +189,13 @@ export default {
         type: 0,
         front_desc: '',
         parent: [],
-        is_show: 1,
+        isShow: 1,
         children: [],
-        sort_order: 50,
-        index_sort_order: 5,
-        icon_url: '',
-        wap_banner_url: '',
-        show_index: 0
+        sortOrder: 50,
+        indexSortOrder: 5,
+        iconUrl: '',
+        wapBannerUrl: '',
+        showIndex: 0
       }
       this.iconCroppa.refresh()
       this.bannerCroppa.refresh()
@@ -245,15 +245,15 @@ export default {
     handleNodeClick (data) {
       this.form.id = data.id
       this.form.name = data.name
-      this.form.front_name = data.front_name
-      this.form.front_desc = data.front_desc
-      this.form.parent = this.findPids(data.parent_id).reverse()
-      this.form.icon_url = data.icon_url
-      this.form.wap_banner_url = data.wap_banner_url
-      this.form.is_show = data.is_show
+      this.form.frontName = data.frontName
+      this.form.frontDesc = data.frontDesc
+      this.form.parent = this.findPids(data.parentId).reverse()
+      this.form.iconUrl = data.iconUrl
+      this.form.wapBannerUrl = data.wapBannerUrl
+      this.form.isShow = data.isShow
       this.form.type = data.type
       this.form.children = data.children
-      this.form.show_index = data.show_index
+      this.form.showIndex = data.showIndex
 
       this.iconCroppa.refresh()
       this.bannerCroppa.refresh()

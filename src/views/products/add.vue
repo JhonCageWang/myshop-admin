@@ -8,16 +8,16 @@
               <el-input v-model="form.name"></el-input>
             </el-form-item>
             <el-form-item label="摘要">
-              <el-input type="textarea" :rows="2" v-model="form.goods_brief" auto-complete="off"></el-input>
+              <el-input type="textarea" :rows="2" v-model="form.goodsBrief" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form-item label="SKU" prop="primaryProduct.goods_sn">
-              <el-input v-model="form.primaryProduct.goods_sn"></el-input>
+            <el-form-item label="货品编码" prop="goodsSn">
+              <el-input v-model="form.goodsSn"></el-input>
             </el-form-item>
             <el-form-item label="分类" prop="categories">
               <el-tree ref="catTree" :data="categories" :props="props" node-key="id" @check-change="onSelectCat" show-checkbox></el-tree>
             </el-form-item>
             <el-form-item label="品牌">
-              <el-select ref="brandTree" :data="brands" v-model="form.brand_id">
+              <el-select ref="brandTree" :data="brands" v-model="form.brandId">
                 <el-option
                   v-for="item in brands"
                   :key="item.id"
@@ -34,7 +34,7 @@
                 <el-button type="text" icon="el-icon-delete" v-if="index > 0" @click="attrDestroy(index)"></el-button>
               </el-row>
             </el-form-item>
-            <el-form-item label="封面" class="no-line-height" prop="list_pic_url">
+            <el-form-item label="封面" class="no-line-height" prop="listPicUrl">
               <croppa v-model="coverCroppa"
                 :width="200"
                 :height="200"
@@ -49,7 +49,7 @@
                 :initial-image="initImgs.cover"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.list_pic_url, 'cover')">
+                @image-remove="onImageRemove(form.listPicUrl, 'cover')">
               </croppa>
             </el-form-item>
             <el-form-item label="展示图" class="no-line-height" prop="gallery">
@@ -67,7 +67,7 @@
                 :initial-image="initImgs.gallery[0]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[0].img_url, 'img1')">
+                @image-remove="onImageRemove(form.gallery[0].imgUrl, 'img1')">
               </croppa>
               <croppa v-model="imgCroppa2"
                 :width="200"
@@ -83,7 +83,7 @@
                 :initial-image="initImgs.gallery[1]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[1].img_url, 'img2')">
+                @image-remove="onImageRemove(form.gallery[1].imgUrl, 'img2')">
               </croppa>
               <croppa v-model="imgCroppa3"
                 :width="200"
@@ -99,7 +99,7 @@
                 :initial-image="initImgs.gallery[2]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[2].img_url, 'img3')">
+                @image-remove="onImageRemove(form.gallery[2].imgUrl, 'img3')">
               </croppa>
               <croppa v-model="imgCroppa4"
                 :width="200"
@@ -115,12 +115,12 @@
                 :initial-image="initImgs.gallery[3]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[3].img_url, 'img4')">
+                @image-remove="onImageRemove(form.gallery[3].imgUrl, 'img4')">
               </croppa>
             </el-form-item>
-            <el-form-item label="描述" class="no-line-height" prop="goods_desc">
+            <el-form-item label="描述" class="no-line-height" prop="goodsDesc">
               <quill-editor
-                v-model="form.goods_desc"
+                v-model="form.goodsDesc"
                 ref="editor"
                 :options="editorOption"
                 style="height: 500px;">
@@ -135,27 +135,27 @@
               </el-row>
             </el-form-item>
             <el-form-item label="库存" prop="primaryProduct.goods_number">
-              <el-input-number v-model.number="form.primaryProduct.goods_number" controls-position="right" :min="1" :max="100000"></el-input-number>
+              <el-input-number v-model.number="form.goodsNumber" controls-position="right" :min="1" :max="100000"></el-input-number>
               <el-tooltip v-if="specs.length" effect="dark" content="存在商品规格组合时，该库存失效，实际库存为规格组合的库存。" placement="top">
                 <i class="el-icon-info" style="color: red;"></i>
               </el-tooltip>
             </el-form-item>
-            <el-form-item label="价格" prop="retail_price">
-              <el-input v-model.number="form.retail_price" style="width: 130px;"></el-input>
+            <el-form-item label="价格" prop="retailPrice">
+              <el-input v-model.number="form.retailPrice" style="width: 130px;"></el-input>
               <el-tooltip v-if="specs.length" effect="dark" content="存在商品规格组合时，该价格失效，实际价格为规格组合的价格。" placement="top">
                 <i class="el-icon-info" style="color: red;"></i>
               </el-tooltip>
             </el-form-item>
             <el-form-item label="新品">
-              <el-radio class="radio" v-model="form.is_new" :label="1">是</el-radio>
-              <el-radio class="radio" v-model="form.is_new" :label="0">否</el-radio>
+              <el-radio class="radio" v-model="form.isNew" :label="1">是</el-radio>
+              <el-radio class="radio" v-model="form.isNew" :label="0">否</el-radio>
             </el-form-item>
             <el-form-item label="排序">
-              <el-input-number v-model="form.sort_order" :min="1" :max="1000"></el-input-number>
+              <el-input-number v-model="form.sortOrder" :min="1" :max="1000"></el-input-number>
             </el-form-item>
             <el-form-item label="物流">
-              <el-radio class="radio" v-model="form.need_express" :label="1">是</el-radio>
-              <el-radio class="radio" v-model="form.need_express" :label="0">否</el-radio>
+              <el-radio class="radio" v-model="form.needExpress" :label="1">是</el-radio>
+              <el-radio class="radio" v-model="form.needExpress" :label="0">否</el-radio>
             </el-form-item>
             <el-form-item label="在售">
               <el-switch
@@ -177,24 +177,24 @@
           </el-form>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="规格组合" name="combination" :disabled="!form.id">
+      <el-tab-pane label="规格组合" name="combination" >
         <el-row :gutter="24">
           <el-col :span="10" :xs="24" :sm="24" :md="10" :lg="10" style="margin-bottom: 20px;">
             <el-button type="success" icon="el-icon-plus" size="small" @click="newSpec" style="margin-bottom: 20px;">新增规格类型</el-button>
             <el-form ref="combinationForm" :rules="rulesAttr" :model="formSpec" label-width="80px" size="small">
-              <template v-for="(sitem, index) in formSpec.spec_arr">
-                <el-form-item label="类型" :prop="'spec_arr.' + index + '.selectedSpecs'" :rules="{required: true, validator: specValidate}">
+              <template v-for="(sitem, index) in formSpec.specArr">
+                <el-form-item label="规格名" :prop="'specArr.' + index + '.selectedSpecs'" :rules="{required: true, validator: specValidate}">
                   <el-select v-model="sitem.selectedSpecs" placeholder="请选择" style="width: 120px;margin-right: 10px;">
                     <el-option v-for="item in specs" :key="item.id" :label="item.name" :value="item.id"></el-option>
                   </el-select>
                   <el-button type="text" icon="el-icon-plus" @click="add"></el-button>
                   <el-button type="text" icon="el-icon-delete" @click="remove(index)" v-show="index > 0"></el-button>
                 </el-form-item>
-                <el-form-item label="规格" :prop="'spec_arr.' + index + '.selectedSpecVal'" :rules="{required: true, message: '请填写具体规格'}">
+                <el-form-item label="规格值" :prop="'specArr.' + index + '.selectedSpecVal'" :rules="{required: true, message: '请填写具体规格'}">
                   <el-input v-model="sitem.selectedSpecVal"></el-input>
                 </el-form-item>
               </template>
-              <el-form-item label="SKU" prop="goods_sn">
+              <el-form-item label="商家编码" prop="goodsSn">
                 <el-input v-model="formSpec.goods_sn"></el-input>
               </el-form-item>
               <el-form-item label="库存" prop="specQuantity">
@@ -222,9 +222,9 @@
                   <span v-else>无</span>
                 </template>
               </el-table-column>
-              <el-table-column prop="goods_sn" label="SKU" width="90" align="right" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="goods_number" label="库存" width="60" align="right" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="retail_price" label="单价" width="60" align="right" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="goodsSn" label="SKU" width="90" align="right" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="goodsNumber" label="库存" width="60" align="right" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="retailPrice" label="单价" width="60" align="right" show-overflow-tooltip></el-table-column>
               <el-table-column label="操作" width="90">
                 <template slot-scope="scope">
                   <el-button type="danger" size="mini" icon="el-icon-delete" @click="destroy(scope.row)">删除</el-button>
@@ -236,12 +236,12 @@
       </el-tab-pane>
     </el-tabs>
     <el-dialog title="新增规格类型" :visible.sync="dialogFormVisible" width="30%">
-      <el-form :model="addSpec" label-width="80px" size="mini">
+      <el-form :model="addSpec" label-width="80px" size="mini" ref="addSpecForm">
         <el-form-item label="规格类型" prop="name" :rules="{required: true, message: '请填写规格类型名称'}">
           <el-input v-model="addSpec.name"></el-input>
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="addSpec.sort_order" :min="1" :max="1000"></el-input-number>
+          <el-input-number v-model="addSpec.sortOrder" :min="1" :max="1000"></el-input-number>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -316,33 +316,32 @@ export default {
       specValidate: specValidate,
       form: {
         id: null,
-        goods_sn: '',
+        goodsSn: '',
         name: '',
-        primaryProduct: {goods_sn: '', goods_number: 1},
         attrs: [{name: '', value: ''}],
         faq: [{question: '', answer: ''}],
-        goods_brief: '',
-        category_id: null,
-        brand_id: null,
+        goodsBrief: '',
+        categoryId: null,
+        brandId: null,
         categories: [],
-        goods_desc: '',
-        goods_number: null,
-        retail_price: null,
-        is_on_sale: 1,
-        is_new: 0,
-        need_express: 1,
-        list_pic_url: '',
-        sort_order: 100,
+        goodsDesc: '',
+        goodsNumber: null,
+        retailPrice: null,
+        isOnSale: 1,
+        isNew: 0,
+        needExpress: 1,
+        listPicUrl: '',
+        sortOrder: 100,
         gallery: []
       },
       formSpec: {
-        spec_arr: [{
+        specArr: [{
           selectedSpecs: null,
           selectedSpecVal: null
         }],
-        goods_sn: '',
-        goods_number: '',
-        retail_price: ''
+        goodsSn: '',
+        goodsNumber: '',
+        retailPrice: ''
       },
       initImgs: {
         cover: '',
@@ -372,27 +371,27 @@ export default {
       loading2: false,
       tbloading: false,
       rules: {
-        'primaryProduct.goods_sn': {required: true, message: '请输入商品SKU'},
+        'goodsSn': {required: true, message: '请输入商品SKU'},
         name: {required: true, message: '请输入商品名称'},
         categories: {required: true, validator: catValidate},
-        list_pic_url: {required: true, validator: coverValidate},
+        listPicUrl: {required: true, validator: coverValidate},
         gallery: {required: true, validator: imageValidate},
-        goods_desc: {required: true, message: '请填写商品描述'},
-        'primaryProduct.goods_number': [
+        goodsDesc: {required: true, message: '请填写商品描述'},
+        'goodsNumber': [
           {required: true, message: '请填写商品库存'},
           {type: 'number', message: '库存必须为数字值'}
         ],
-        retail_price: [
+        retailPrice: [
           {required: true, message: '请填写商品价格'},
           {type: 'number', message: '价格必须为数字值'}
         ]
       },
       rulesAttr: {
-        goods_number: [
+        goodsNumber: [
           {required: true, message: '请填写商品库存'},
           {type: 'number', message: '库存必须为数字值'}
         ],
-        retail_price: [
+        retailPrice: [
           {required: true, message: '请填写商品价格'},
           {type: 'number', message: '价格必须为数字值'}
         ]
@@ -437,23 +436,23 @@ export default {
   },
   methods: {
     getAllCats () {
-      this.$http.get(api.CATEGORY + '?type=0').then(data => {
+      this.$http.get(api.CATEGORY + '/index?type=0').then(data => {
         this.categories = data.data
       })
     },
     getAllBrands () {
-      this.$http.get(api.BRAND + '?size=10000&page=1').then(data => {
-        this.brands = data.data.data
+      this.$http.get(api.BRAND + '/index?size=10000&page=1').then(data => {
+        this.brands = data.data.list
       })
     },
     getAllSpecs () {
-      this.$http.get(api.SPECIFICATION + '?size=10000&page=1').then(data => {
-        this.specs = data.data.data
+      this.$http.get(api.SPECIFICATION + '/index?size=10000&page=1').then(data => {
+        this.specs = data.data.list
       })
     },
     getGoodsSpecs () {
       this.tbloading = true
-      this.$http.get(api.SPECIFICATION + '/goods?id=' + this.form.id).then(data => {
+      this.$http.get(api.SPECIFICATION + '/goods?goodsId=' + this.form.id).then(data => {
         this.tbloading = false
         this.goodsSpecs = data.data
       }).catch(() => {
@@ -467,10 +466,10 @@ export default {
         if (this.form.attrs.length === 0) {
           this.form.attrs.push({name: '', value: ''})
         }
-        this.form.categories = [this.form.category_id]
-        this.form.retail_price = Number(this.form.retail_price)
-        this.$refs.catTree.setCheckedKeys([this.form.category_id])
-        if (this.form.list_pic_url) {
+        this.form.categories = [this.form.categoryId]
+        this.form.retailPrice = Number(this.form.retailPrice)
+        this.$refs.catTree.setCheckedKeys([this.form.categoryId])
+        if (this.form.listPicUrl) {
           this.initImgs.cover = /^http/i.test(this.form.list_pic_url) ? this.form.list_pic_url : api.QiniuDomain + this.form.list_pic_url
           this.coverChanged = false
         }
@@ -494,10 +493,11 @@ export default {
       this.$refs.form.validate(async (valid) => {
         if (valid) {
           this.loading = true
+          debugger
           if (this.coverCroppa.hasImage() && this.coverChanged) {
             const cover = await this.coverCroppa.promisedBlob('image/jpeg', 1)
             const res = await utils.qupload(cover, api.GoodsImgPrefix)
-            this.form.list_pic_url = res.key
+            this.form.listPicUrl = res.key
           }
           if (this.imgCroppa1.hasImage() && this.img1Changed) {
             const img1 = await this.imgCroppa1.promisedBlob('image/jpeg', 1)
@@ -519,12 +519,12 @@ export default {
             const res = await utils.qupload(img4, api.GoodsImgPrefix)
             this.form.gallery.push(res.key)
           }
-          this.form.category_id = this.form.categories[0]
+          this.form.categoryId = this.form.categories[0]
           // thinkjs不支持直接传递数组，改为json格式提交
           this.$http.post(api.GOODS + '/store', this.form, {headers: {'Content-Type': 'application/json'}}).then((data) => {
             this.loading = false
 
-            if (data.errno === 0) {
+            if (data.code === 0) {
               this.form = data.data
               this.$notify({title: '成功', message: '保存成功', type: 'success'})
               this.$confirm('是否继续添加商品规格?', '提示', {
@@ -604,7 +604,7 @@ export default {
       fileInput.click()
     },
     add () {
-      this.formSpec.spec_arr.push({
+      this.formSpec.specArr.push({
         selectedSpecs: null,
         selectedSpecVal: null
       })
@@ -644,10 +644,10 @@ export default {
       this.dialogFormVisible = true
     },
     saveSpec () {
-      this.$refs.combinationForm.validate(valid => {
+      this.$refs.addSpecForm.validate(valid => {
         if (valid) {
           this.$http.post(api.SPECIFICATION + '/store', this.addSpec).then((data) => {
-            if (data.errno === 0) {
+            if (data.code === 0) {
               this.$notify({title: '成功', message: '添加成功', type: 'success'})
               this.dialogFormVisible = false
               this.getAllSpecs()
@@ -665,15 +665,15 @@ export default {
           this.loading2 = true
           this.formSpec.goods_id = this.form.id
           this.$http.post(api.SPECIFICATION + '/save', this.formSpec).then((data) => {
-            if (data.errno === 0) {
+            if (data.code === 0) {
               this.formSpec = {
-                spec_arr: [{
+                specArr: [{
                   selectedSpecs: null,
                   selectedSpecVal: null
                 }],
-                goods_sn: '',
-                goods_number: '',
-                retail_price: ''
+                goodsSn: '',
+                goodsNumber: '',
+                retailPrice: ''
               }
               this.$notify({title: '成功', message: '保存成功', type: 'success'})
               this.getGoodsSpecs()

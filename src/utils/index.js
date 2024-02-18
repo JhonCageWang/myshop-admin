@@ -5,6 +5,7 @@ import * as api from '../api'
 import {Message} from 'element-ui'
 
 export const qupload = (file, prefix = '') => {
+  console.log('file', file)
   let options = {
     quality: 0.92,
     noCompressIfLarger: true
@@ -29,14 +30,15 @@ export const qupload = (file, prefix = '') => {
     }
 
     http.get(api.UP_TOKEN).then(res => {
+      console.info('name', file.name)
       if (file.name) {
         qiniu.compressImage(file, options).then(data => {
           let ext = file.name.split('.').pop()
-          var observable = qiniu.upload(data.dist, prefix + (new Date()).getTime() + '.' + ext, res.uptoken, {}, {})
+          var observable = qiniu.upload(data.dist, prefix + (new Date()).getTime() + '.' + ext, res.data.upToken, {}, {})
           observable.subscribe(observer) // 上传开始
         })
       } else {
-        var observable = qiniu.upload(file, prefix + (new Date()).getTime() + '.jpg', res.uptoken, {}, {})
+        var observable = qiniu.upload(file, prefix + (new Date()).getTime() + '.jpg', res.data.upToken, {}, {})
         observable.subscribe(observer) // 上传开始
       }
     }).catch(err => {

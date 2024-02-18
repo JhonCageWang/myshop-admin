@@ -9,7 +9,7 @@
           <el-input v-model="form.code"></el-input>
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="form.sort_order" :min="1" :max="1000"></el-input-number>
+          <el-input-number v-model="form.sortOrder" :min="1" :max="1000"></el-input-number>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="save" :loading="loading">保存</el-button>
@@ -37,7 +37,7 @@ export default {
       loading: false,
       rules: {
         name: {required: true, message: '请输入快递名'},
-        code: {required: true, message: '请输入快递鸟编号'}
+        code: {required: true, message: '请输入快递编号'}
       }
     }
   },

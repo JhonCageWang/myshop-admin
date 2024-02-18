@@ -9,9 +9,9 @@ axios.defaults.timeout = 15000
 axios.interceptors.request.use(function (config) {
   // if (config.method === 'post' && config.data.constructor !== FormData) {
   //   config.data = qs.stringify(config.data)
-  // }
+  // }  X-Nideshop-
   if (store.getters.token) {
-    config.headers['token'] = store.getters.token
+    config.headers['X-Nideshop-Token'] = store.getters.token
   }
   return config
 }, function (error) {
@@ -20,7 +20,7 @@ axios.interceptors.request.use(function (config) {
 
 axios.interceptors.response.use(
   response => {
-    if (response.data && response.data.errno === 401) {
+    if (response.data && response.data.code === 401) {
       router.replace({
         path: '/login',
         query: {redirect: router.currentRoute.fullPath}
@@ -28,16 +28,16 @@ axios.interceptors.response.use(
       Message.error('登录过期，请重新登录')
       return
     }
-    if (response.data && response.status === 200 && response.data.errno === 0) {
+    if (response.data && response.status === 200 && response.data.code === 0) {
       return response.data
     } else {
-      Message.error(response.data.errmsg)
+      Message.error(response.data.msg)
       return response.data
     }
   },
   error => {
     if (error.response) {
-      if (error.response.status === 401) {
+      if (error.response.code === 401) {
         router.replace({
           path: '/login',
           query: {redirect: router.currentRoute.fullPath}
