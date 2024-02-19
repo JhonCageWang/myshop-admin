@@ -100,7 +100,7 @@ export default {
     destroy (row) {
       this.$confirm(`确定删除商品“${row.name}”吗?`, '提示', {type: 'warning'}).then(() => {
         this.$http.post(api.GOODS + '/destroy', {id: row.id}).then(data => {
-          if (data.errno === 0) {
+          if (data.code === 0) {
             this.$notify({title: '成功', message: '删除成功', type: 'success'})
             this.getProductsList()
           }

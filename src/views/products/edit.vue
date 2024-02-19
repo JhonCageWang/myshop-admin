@@ -10,8 +10,8 @@
             <el-form-item label="摘要">
               <el-input type="textarea" :rows="2" v-model="form.goodsBrief" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form-item label="SKU" prop="primaryProduct.goodsSn">
-              <el-input v-model="form.primaryProduct.goodsSn"></el-input>
+            <el-form-item label="货品编码" prop="goodsSn">
+              <el-input v-model="form.goodsSn"></el-input>
             </el-form-item>
             <el-form-item label="分类" prop="categories">
               <el-tree ref="catTree" :data="categories" :props="props" node-key="id" @check-change="onSelectCat" show-checkbox></el-tree>
@@ -134,8 +134,8 @@
                 <el-button type="text" icon="el-icon-delete" v-if="index > 0" @click="faqDestroy(index)"></el-button>
               </el-row>
             </el-form-item>
-            <el-form-item label="库存" prop="primaryProduct.goodsNumber">
-              <el-input-number v-model.number="form.primaryProduct.goodsNumber" controls-position="right" :min="1" :max="100000"></el-input-number>
+            <el-form-item label="库存" prop="goodsNumber">
+              <el-input-number v-model.number="form.goodsNumber" controls-position="right" :min="1" :max="100000"></el-input-number>
               <el-tooltip v-if="specs.length" effect="dark" content="存在商品规格组合时，该库存失效，实际库存为规格组合的库存。" placement="top">
                 <i class="el-icon-info" style="color: red;"></i>
               </el-tooltip>
@@ -194,14 +194,32 @@
                   <el-input v-model="sitem.selectedSpecVal"></el-input>
                 </el-form-item>
               </template>
-              <el-form-item label="SKU" prop="goodsSn">
+              <el-form-item label="规格编码" prop="goodsSn">
                 <el-input v-model="formSpec.goodsSn"></el-input>
               </el-form-item>
               <el-form-item label="库存" prop="specQuantity">
-                <el-input-number v-model.number="formSpec.goods_number" controls-position="right" :min="1" :max="100000"></el-input-number>
+                <el-input-number v-model.number="formSpec.goodsNumber" controls-position="right" :min="1" :max="100000"></el-input-number>
               </el-form-item>
               <el-form-item label="价格" prop="specPrice">
-                <el-input v-model.number="formSpec.retail_price"></el-input>
+                <el-input-number v-model.number="formSpec.retailPrice"></el-input-number>
+              </el-form-item>
+              <el-form-item label="规格图" class="no-line-height" prop="listPicUrl">
+                <croppa v-model="productCroppa"
+                  :width="200"
+                  :height="200"
+                  canvas-color="default"
+                  placeholder="点击选择, PNG/JPEG, <500K"
+                  :placeholder-font-size="12"
+                  placeholder-color="default"
+                  accept="image/png,image/jpeg"
+                  :file-size-limit="512000"
+                  :quality="4"
+                  :prevent-white-space="true"
+                  :initial-image="formSpec.listPicUrl"
+                  @file-size-exceed="onFileSizeExceed"
+                  @file-type-mismatch="onFileTypeMismatch"
+                  @image-remove="onImageRemove(formSpec.listPicUrl, 'product')">
+                </croppa>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="saveCombinations" :loading="loading2">保存</el-button>
@@ -214,7 +232,7 @@
           <el-col :span="14" :xs="24" :sm="24" :md="14" :lg="14">
             <el-table :data="goodsSpecs" stripe border v-loading="tbloading">
               <el-table-column type="index" width="50" align="center"></el-table-column>
-              <el-table-column label="规格" min-width="140" show-overflow-tooltip>
+              <el-table-column label="规格" min-width="80" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <span v-if="scope.row.specs.length > 0" v-for="item in scope.row.specs" :key="item.id">
                     <strong>{{ item.name }}</strong>:&nbsp;{{ item.value }}<br/>
@@ -222,11 +240,20 @@
                   <span v-else>无</span>
                 </template>
               </el-table-column>
-              <el-table-column prop="goodsSn" label="SKU" width="90" align="right" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="goodsSn" label="规格编码" width="90" align="right" show-overflow-tooltip></el-table-column>
               <el-table-column prop="goodsNumber" label="库存" width="60" align="right" show-overflow-tooltip></el-table-column>
               <el-table-column prop="retailPrice" label="单价" width="60" align="right" show-overflow-tooltip></el-table-column>
-              <el-table-column label="操作" width="90">
+              <el-table-column prop="picUrl" label="规格图" width="200" align="right">
                 <template slot-scope="scope">
+                  <el-image
+                    style="width: 100px; height: 100px"
+                    :src="scope.row.picUrl"
+                    :fit="fit"></el-image>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="200">
+                <template slot-scope="scope">
+                  <el-button size="mini" icon="el-icon-edit" @click="editProduct(scope.row)">编辑</el-button>
                   <el-button type="danger" size="mini" icon="el-icon-delete" @click="destroy(scope.row)">删除</el-button>
                 </template>
               </el-table-column>
@@ -291,7 +318,7 @@ export default {
       }
 
       let count = 0
-      that.formSpec.spec_arr.forEach(item => {
+      that.formSpec.specArr.forEach(item => {
         if (item.selectedSpecs && item.selectedSpecs === value) {
           count++
         }
@@ -332,8 +359,8 @@ export default {
         isOnSale: 1,
         isNew: 0,
         need_express: 1,
-        list_pic_url: '',
-        sort_order: 100,
+        listPicUrl: '',
+        sortOrder: 100,
         gallery: []
       },
       formSpec: {
@@ -343,7 +370,8 @@ export default {
         }],
         goodsSn: '',
         goodsNumber: '',
-        retailPrice: ''
+        retailPrice: '',
+        listPicUrl: ''
       },
       initImgs: {
         cover: '',
@@ -354,6 +382,7 @@ export default {
       img2Changed: false,
       img3Changed: false,
       img4Changed: false,
+      productCroppa:null,
       activeName: 'info',
       specs: [],
       goodsSpecs: [],
@@ -373,13 +402,13 @@ export default {
       loading2: false,
       tbloading: false,
       rules: {
-        'primaryProduct.goodsSn': {required: true, message: '请输入商品SKU'},
+        'goodsSn': {required: true, message: '请输入商品SKU'},
         name: {required: true, message: '请输入商品名称'},
         categories: {required: true, validator: catValidate},
         listPicUrl: {required: true, validator: coverValidate},
         gallery: {required: true, validator: imageValidate},
         goodsDesc: {required: true, message: '请填写商品描述'},
-        'primaryProduct.goodsNumber': [
+        'goodsNumber': [
           {required: true, message: '请填写商品库存'},
           {type: 'number', message: '库存必须为数字值'}
         ],
@@ -460,6 +489,10 @@ export default {
       this.$http.get(api.SPECIFICATION + '/goods?goodsId=' + this.id).then(data => {
         this.tbloading = false
         this.goodsSpecs = data.data
+        this.goodsSpecs.forEach((item,index) => {
+          console.log("url",item)
+          item.picUrl = /^http/i.test(item.picUrl) ? item.picUrl : api.QiniuDomain + item.picUrl
+        })
       }).catch(() => {
         this.tbloading = false
       })
@@ -478,9 +511,9 @@ export default {
           this.initImgs.cover = /^http/i.test(this.form.listPicUrl) ? this.form.listPicUrl : api.QiniuDomain + this.form.listPicUrl
           this.coverChanged = false
         }
-        this.initImgs.gallery = data.data.gallery.map((item, index) => {
+        this.initImgs.gallery = data.data.goodsGalleryList.map((item, index) => {
           this[`img${index + 1}Changed`] = false
-          return /^http/i.test(item.img_url) ? item.img_url : api.QiniuDomain + item.img_url
+          return /^http/i.test(item.imgUrl) ? item.imgUrl : api.QiniuDomain + item.imgUrl
         })
         this.coverCroppa.refresh()
         this.imgCroppa1.refresh()
@@ -555,6 +588,9 @@ export default {
         case 'cover':
           this.coverChanged = true
           break
+        case 'product':
+          this.productChanged = true
+          break
         case 'img1':
           this.img1Changed = true
           break
@@ -597,13 +633,13 @@ export default {
       fileInput.click()
     },
     add () {
-      this.formSpec.spec_arr.push({
+      this.formSpec.specArr.push({
         selectedSpecs: null,
         selectedSpecVal: null
       })
     },
     remove (index) {
-      this.formSpec.spec_arr.splice(index, 1)
+      this.formSpec.specArr.splice(index, 1)
     },
     destroy (row) {
       let attr = []
@@ -611,13 +647,25 @@ export default {
         attr.push(item.value)
       })
       this.$confirm(`确定删除商品属性“${attr.join('|')}”吗?`, '提示', {type: 'warning'}).then(() => {
-        this.$http.get(api.SPECIFICATION + '/destroy?pid=' + row.id).then((data) => {
-          if (data.errno === 0) {
+        this.$http.post(api.SPECIFICATION + '/destroy',{id:row.id}, {headers: {'Content-Type': 'application/json'}}).then((data) => {
+          if (data.code === 0) {
             this.$notify({title: '成功', message: '删除成功', type: 'success'})
             this.getGoodsSpecs()
           }
         })
       })
+    },
+    editProduct (row) {
+      console.log("row",row)
+      this.$http.get(api.SPECIFICATION + '/product?id='+row.id).then((data) => {
+          if (data.code === 0) {
+            this.formSpec = data.data
+            this.formSpec.listPicUrl = /^http/i.test(this.formSpec.listPicUrl) ? this.formSpec.listPicUrl : api.QiniuDomain + this.formSpec.listPicUrl
+            this.productCroppa.refresh()
+            this.productChanged = false
+          }
+        })
+      
     },
     attrDestroy (index) {
       this.form.attrs.splice(index, 1)
@@ -640,7 +688,7 @@ export default {
       this.$refs.specForm.validate(valid => {
         if (valid) {
           this.$http.post(api.SPECIFICATION + '/store', this.addSpec).then((data) => {
-            if (data.errno === 0) {
+            if (data.code === 0) {
               this.$notify({title: '成功', message: '添加成功', type: 'success'})
               this.dialogFormVisible = false
               this.getAllSpecs()
@@ -653,10 +701,15 @@ export default {
       })
     },
     saveCombinations () {
-      this.$refs.combinationForm.validate(valid => {
+      this.$refs.combinationForm.validate( async (valid) => {
         if (valid) {
           this.loading2 = true
           this.formSpec.goodsId = this.id
+          if (this.productCroppa.hasImage() && this.coverChanged) {
+            const cover = await this.productCroppa.promisedBlob('image/jpeg', 1)
+            const res = await utils.qupload(cover, api.GoodsImgPrefix)
+            this.formSpec.listPicUrl = res.key
+          }
           this.$http.post(api.SPECIFICATION + '/save', this.formSpec).then((data) => {
             if (data.code === 0) {
               this.formSpec = {
@@ -666,9 +719,11 @@ export default {
                 }],
                 goodsSn: '',
                 goodsNumber: '',
-                retailPrice: ''
+                retailPrice: '',
+                listPicUrl: ''
               }
               this.$notify({title: '成功', message: '保存成功', type: 'success'})
+              this.productCroppa.refresh()
               this.getGoodsSpecs()
             }
             this.loading2 = false

@@ -195,13 +195,31 @@
                 </el-form-item>
               </template>
               <el-form-item label="商家编码" prop="goodsSn">
-                <el-input v-model="formSpec.goods_sn"></el-input>
+                <el-input v-model="formSpec.goodsSn"></el-input>
               </el-form-item>
               <el-form-item label="库存" prop="specQuantity">
-                <el-input-number v-model.number="formSpec.goods_number" controls-position="right" :min="1" :max="100000"></el-input-number>
+                <el-input-number v-model.number="formSpec.goodsNumber" controls-position="right" :min="1" :max="100000"></el-input-number>
               </el-form-item>
               <el-form-item label="价格" prop="specPrice">
-                <el-input v-model.number="formSpec.retail_price"></el-input>
+                <el-input-number  v-model.number="formSpec.retailPrice"></el-input-number >
+              </el-form-item>
+              <el-form-item label="规格图" class="no-line-height" prop="listPicUrl">
+                <croppa v-model="productCroppa"
+                  :width="200"
+                  :height="200"
+                  canvas-color="default"
+                  placeholder="点击选择, PNG/JPEG, <500K"
+                  :placeholder-font-size="12"
+                  placeholder-color="default"
+                  accept="image/png,image/jpeg"
+                  :file-size-limit="512000"
+                  :quality="4"
+                  :prevent-white-space="true"
+                  :initial-image="formSpec.listPicUrl"
+                  @file-size-exceed="onFileSizeExceed"
+                  @file-type-mismatch="onFileTypeMismatch"
+                  @image-remove="onImageRemove(formSpec.listPicUrl, 'product')">
+                </croppa>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="saveCombinations" :loading="loading2">保存</el-button>
@@ -214,7 +232,7 @@
           <el-col :span="14" :xs="24" :sm="24" :md="14" :lg="14">
             <el-table :data="goodsSpecs" stripe border v-loading="tbloading">
               <el-table-column type="index" width="50" align="center"></el-table-column>
-              <el-table-column label="规格" min-width="140" show-overflow-tooltip>
+              <el-table-column label="规格" min-width="100" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <span v-if="scope.row.specs.length > 0" v-for="item in scope.row.specs" :key="item.id">
                     <strong>{{ item.name }}</strong>:&nbsp;{{ item.value }}<br/>
@@ -222,9 +240,17 @@
                   <span v-else>无</span>
                 </template>
               </el-table-column>
-              <el-table-column prop="goodsSn" label="SKU" width="90" align="right" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="goodsSn" label="SKU编码" width="90" align="right" show-overflow-tooltip></el-table-column>
               <el-table-column prop="goodsNumber" label="库存" width="60" align="right" show-overflow-tooltip></el-table-column>
               <el-table-column prop="retailPrice" label="单价" width="60" align="right" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="picUrl" label="规格图" width="100" align="right">
+                <template slot-scope="scope">
+                  <el-image
+                    style="width: 100px; height: 100px"
+                    :src="scope.row.picUrl"
+                    :fit="fit"></el-image>
+                </template>
+              </el-table-column>
               <el-table-column label="操作" width="90">
                 <template slot-scope="scope">
                   <el-button type="danger" size="mini" icon="el-icon-delete" @click="destroy(scope.row)">删除</el-button>
@@ -291,7 +317,7 @@ export default {
       }
 
       let count = 0
-      that.formSpec.spec_arr.forEach(item => {
+      that.formSpec.specArr.forEach(item => {
         if (item.selectedSpecs && item.selectedSpecs === value) {
           count++
         }
@@ -341,13 +367,16 @@ export default {
         }],
         goodsSn: '',
         goodsNumber: '',
-        retailPrice: ''
+        retailPrice: '',
+        listPicUrl:''
       },
       initImgs: {
         cover: '',
+        product:'',
         gallery: []
       },
       coverChanged: true,
+      productChanged: true,
       img1Changed: true,
       img2Changed: true,
       img3Changed: true,
@@ -367,6 +396,7 @@ export default {
       imgCroppa2: null,
       imgCroppa3: null,
       imgCroppa4: null,
+      productCroppa:null,
       loading: false,
       loading2: false,
       tbloading: false,
@@ -470,7 +500,7 @@ export default {
         this.form.retailPrice = Number(this.form.retailPrice)
         this.$refs.catTree.setCheckedKeys([this.form.categoryId])
         if (this.form.listPicUrl) {
-          this.initImgs.cover = /^http/i.test(this.form.list_pic_url) ? this.form.list_pic_url : api.QiniuDomain + this.form.list_pic_url
+          this.initImgs.cover = /^http/i.test(this.form.listPicUrl) ? this.form.listPicUrl : api.QiniuDomain + this.form.listPicUrl
           this.coverChanged = false
         }
         this.initImgs.gallery = data.data.gallery.map((item, index) => {
@@ -493,7 +523,6 @@ export default {
       this.$refs.form.validate(async (valid) => {
         if (valid) {
           this.loading = true
-          debugger
           if (this.coverCroppa.hasImage() && this.coverChanged) {
             const cover = await this.coverCroppa.promisedBlob('image/jpeg', 1)
             const res = await utils.qupload(cover, api.GoodsImgPrefix)
@@ -561,6 +590,9 @@ export default {
         case 'cover':
           this.coverChanged = true
           break
+        case 'product':
+          this.productChanged = true
+          break
         case 'img1':
           this.img1Changed = true
           break
@@ -610,7 +642,7 @@ export default {
       })
     },
     remove (index) {
-      this.formSpec.spec_arr.splice(index, 1)
+      this.formSpec.specArr.splice(index, 1)
     },
     destroy (row) {
       let attr = []
@@ -618,8 +650,8 @@ export default {
         attr.push(item.value)
       })
       this.$confirm(`确定删除商品属性“${attr.join('|')}”吗?`, '提示', {type: 'warning'}).then(() => {
-        this.$http.get(api.SPECIFICATION + '/destroy?pid=' + row.id).then((data) => {
-          if (data.errno === 0) {
+        this.$http.post(api.SPECIFICATION + '/destroy',{'id':row.id}, {headers: {'Content-Type': 'application/json'}}).then((data) => {
+          if (data.code === 0) {
             this.$notify({title: '成功', message: '删除成功', type: 'success'})
             this.getGoodsSpecs()
           }
@@ -660,10 +692,15 @@ export default {
       })
     },
     saveCombinations () {
-      this.$refs.combinationForm.validate(valid => {
+      this.$refs.combinationForm.validate( async(valid) => {
         if (valid) {
           this.loading2 = true
-          this.formSpec.goods_id = this.form.id
+          this.formSpec.goodsId = this.form.id
+          if (this.productCroppa.hasImage() && this.coverChanged) {
+            const cover = await this.productCroppa.promisedBlob('image/jpeg', 1)
+            const res = await utils.qupload(cover, api.GoodsImgPrefix)
+            this.formSpec.listPicUrl = res.key
+          }
           this.$http.post(api.SPECIFICATION + '/save', this.formSpec).then((data) => {
             if (data.code === 0) {
               this.formSpec = {
@@ -673,8 +710,11 @@ export default {
                 }],
                 goodsSn: '',
                 goodsNumber: '',
-                retailPrice: ''
+                retailPrice: '',
+                listPicUrl: ''
               }
+              this.productCroppa.refresh()
+              // this.initImgs.cover = /^http/i.test(this.form.listPicUrl) ? this.form.listPicUrl : api.QiniuDomain + this.form.listPicUrl
               this.$notify({title: '成功', message: '保存成功', type: 'success'})
               this.getGoodsSpecs()
             }

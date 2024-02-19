@@ -85,7 +85,7 @@
                 <el-input-number v-model="form.sortOrder" :min="1" :max="1000"></el-input-number>
               </el-form-item>
               <el-form-item label="首页排序" v-show="catType === 0">
-                <el-input-number v-model="form.indexSortOrder" :min="1" :max="1000"></el-input-number>
+                <el-input-number v-model="form.showIndex" :min="1" :max="1000"></el-input-number>
               </el-form-item>
               <el-form-item label="状态">
                 <el-radio class="radio" v-model="form.isShow" :label="1">启用</el-radio>
@@ -185,9 +185,9 @@ export default {
       this.form = {
         id: null,
         name: '',
-        front_name: '',
+        frontName: '',
         type: 0,
-        front_desc: '',
+        frontDesc: '',
         parent: [],
         isShow: 1,
         children: [],
@@ -205,19 +205,19 @@ export default {
         if (valid) {
           this.loading = true
           if (this.form.parent.length > 0) {
-            this.form.parent_id = this.form.parent[this.form.parent.length - 1]
+            this.form.parentId = this.form.parent[this.form.parent.length - 1]
           } else {
-            this.form.parent_id = 0
+            this.form.parentId = 0
           }
           if (this.iconCroppa.hasImage() && this.iconChange) {
             const icon = await this.iconCroppa.promisedBlob('image/jpeg', 0.8)
             const res = await utils.qupload(icon, api.CategoryIconPrefix)
-            this.form.icon_url = res.key
+            this.form.iconUrl = res.key
           }
           if (this.bannerCroppa.hasImage() && this.bannerChange) {
             const banner = await this.bannerCroppa.promisedBlob('image/jpeg', 0.8)
             const res = await utils.qupload(banner, api.CategoryBannerPrefix)
-            this.form.wap_banner_url = res.key
+            this.form.wapBannerUrl = res.key
           }
           this.$http.post(api.CATEGORY + '/store', this.form).then(data => {
             this.$notify({title: '成功', message: this.form.id ? '更新成功' : '添加成功', type: 'success'})
@@ -233,7 +233,7 @@ export default {
     },
     destroy () {
       this.$confirm(`确定删除分类“${this.form.name}”吗?`, '提示', {type: 'warning'}).then(() => {
-        this.$http.post(api.CATEGORY + '/destory', {id: this.form.id}).then(data => {
+        this.$http.post(api.CATEGORY + '/delete', {id: this.form.id}).then(data => {
           this.$notify({title: '成功', message: '删除成功', type: 'success'})
           this.getCategoriesList()
           this.add()
@@ -254,6 +254,7 @@ export default {
       this.form.type = data.type
       this.form.children = data.children
       this.form.showIndex = data.showIndex
+      this.form.sortOrder = data.sortOrder
 
       this.iconCroppa.refresh()
       this.bannerCroppa.refresh()
@@ -315,7 +316,7 @@ export default {
     },
     bannerUpload (file) {
       utils.qupload(file, api.CategoryBannerPrefix).then(res => {
-        this.form.wap_banner_url = res.key
+        this.form.wapBannerUrl = res.key
       }).catch(err => {
         this.$message.error(err + '')
       })

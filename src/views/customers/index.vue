@@ -18,9 +18,9 @@
           <el-tag type="danger" size="small" v-if="scope.row.gender === 0">女</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="last_login_ip" label="最后登录IP" width="150" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="last_login_time" label="最后登录" width="170" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="add_time" label="注册日期" width="170" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="lastLoginIp" label="最后登录IP" width="150" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="lastLoginTime" label="最后登录" width="170" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="registerTime" label="注册日期" width="170" show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-fa fa-mouse-pointer" @click="showFootprint(scope.row)">足迹</el-button>
@@ -47,7 +47,7 @@
         </el-table-column>
         <el-table-column prop="name" label="商品名称" min-width="100" show-overflow-tooltip></el-table-column>
         <el-table-column prop="goods_sn" label="商品编号" align="center" width="80" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="add_time" label="访问时间" width="170" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="addTime" label="访问时间" width="170" show-overflow-tooltip></el-table-column>
       </el-table>
       <el-pagination
         style="margin-top: 20px"
@@ -127,9 +127,9 @@ export default {
       if (search) {
         this.page.page = 1
       }
-      this.$http.get(api.CUSTOMER + `?page=${this.page.page}&size=${this.page.size}&name=${this.keywords}`).then(data => {
-        this.customers = data.data.data
-        this.page.total = data.data.count
+      this.$http.get(api.CUSTOMER + `/list?page=${this.page.page}&size=${this.page.size}&name=${this.keywords}`).then(data => {
+        this.customers = data.data.list
+        this.page.total = data.data.total
         this.tbloading = false
       }).catch(err => {
         this.$message.error(err + '')
