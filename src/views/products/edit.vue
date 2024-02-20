@@ -305,6 +305,7 @@ export default {
       callback()
     }
     let catValidate = function (rule, value, callback) {
+      debugger
       if (value.length === 0) {
         callback(new Error('请选择商品分类'))
       } else if (value.length > 1) {
@@ -358,7 +359,7 @@ export default {
         retailPrice: null,
         isOnSale: 1,
         isNew: 0,
-        need_express: 1,
+        needExpress: 1,
         listPicUrl: '',
         sortOrder: 100,
         gallery: []
@@ -382,7 +383,7 @@ export default {
       img2Changed: false,
       img3Changed: false,
       img4Changed: false,
-      productCroppa:null,
+      productCroppa: null,
       activeName: 'info',
       specs: [],
       goodsSpecs: [],
@@ -405,9 +406,6 @@ export default {
         'goodsSn': {required: true, message: '请输入商品SKU'},
         name: {required: true, message: '请输入商品名称'},
         categories: {required: true, validator: catValidate},
-        listPicUrl: {required: true, validator: coverValidate},
-        gallery: {required: true, validator: imageValidate},
-        goodsDesc: {required: true, message: '请填写商品描述'},
         'goodsNumber': [
           {required: true, message: '请填写商品库存'},
           {type: 'number', message: '库存必须为数字值'}
@@ -489,8 +487,7 @@ export default {
       this.$http.get(api.SPECIFICATION + '/goods?goodsId=' + this.id).then(data => {
         this.tbloading = false
         this.goodsSpecs = data.data
-        this.goodsSpecs.forEach((item,index) => {
-          console.log("url",item)
+        this.goodsSpecs.forEach((item, index) => {
           item.picUrl = /^http/i.test(item.picUrl) ? item.picUrl : api.QiniuDomain + item.picUrl
         })
       }).catch(() => {
@@ -511,10 +508,18 @@ export default {
           this.initImgs.cover = /^http/i.test(this.form.listPicUrl) ? this.form.listPicUrl : api.QiniuDomain + this.form.listPicUrl
           this.coverChanged = false
         }
-        this.initImgs.gallery = data.data.goodsGalleryList.map((item, index) => {
-          this[`img${index + 1}Changed`] = false
-          return /^http/i.test(item.imgUrl) ? item.imgUrl : api.QiniuDomain + item.imgUrl
-        })
+        if (data.data.goodsGalleryList.length > 0) {
+          this.initImgs.gallery = data.data.goodsGalleryList.map((item, index) => {
+              this[`img${index + 1}Changed`] = false
+              return /^http/i.test(item.imgUrl) ? item.imgUrl : api.QiniuDomain + item.imgUrl
+          })
+        } else {
+          this.img1Changed = true,
+          this.img2Changed = true,
+          this.img3Changed = true,this.img4Changed = true
+        }
+        this.form.gallery = data.data.goodsGalleryList
+        
         this.coverCroppa.refresh()
         this.imgCroppa1.refresh()
         this.imgCroppa2.refresh()
@@ -529,32 +534,34 @@ export default {
     },
     save () {
       this.$refs.form.validate(async (valid) => {
+        debugger
         if (valid) {
+          debugger
           this.loading = true
           if (this.coverCroppa.hasImage() && this.coverChanged) {
             const cover = await this.coverCroppa.promisedBlob('image/jpeg', 1)
             const res = await utils.qupload(cover, api.GoodsImgPrefix)
-            this.form.icon_url = res.key
+            this.form.listPicUrl = res.key
           }
           if (this.imgCroppa1.hasImage() && this.img1Changed) {
             const img1 = await this.imgCroppa1.promisedBlob('image/jpeg', 1)
             const res = await utils.qupload(img1, api.GoodsImgPrefix)
-            this.form.gallery[0].img_url = res.key
+            this.form.gallery[0] = res.key
           }
           if (this.imgCroppa2.hasImage() && this.img2Changed) {
             const img2 = await this.imgCroppa2.promisedBlob('image/jpeg', 1)
             const res = await utils.qupload(img2, api.GoodsImgPrefix)
-            this.form.gallery[1].img_url = res.key
+            this.form.gallery[1] = res.key
           }
           if (this.imgCroppa3.hasImage() && this.img3Changed) {
             const img3 = await this.imgCroppa3.promisedBlob('image/jpeg', 1)
             const res = await utils.qupload(img3, api.GoodsImgPrefix)
-            this.form.gallery[2].img_url = res.key
+            this.form.gallery[2] = res.key
           }
           if (this.imgCroppa4.hasImage() && this.img4Changed) {
             const img4 = await this.imgCroppa4.promisedBlob('image/jpeg', 1)
             const res = await utils.qupload(img4, api.GoodsImgPrefix)
-            this.form.gallery[3].img_url = res.key
+            this.form.gallery[3] = res.key
           }
           this.form.categoryId = this.form.categories[0]
           // thinkjs不支持直接传递数组，改为json格式提交
@@ -572,7 +579,12 @@ export default {
       })
     },
     onSelectCat (data, checked, indeterminate) {
-      this.form.categories = this.$refs.catTree.getCheckedKeys(true)
+      if (checked) {
+        this.form.categories = [data.id]
+      } else {
+        this.form.categories = []
+      }
+      debugger
     },
     onFileSizeExceed (file) {
       this.$message.error('图片大小不能超过 500K')
@@ -647,7 +659,7 @@ export default {
         attr.push(item.value)
       })
       this.$confirm(`确定删除商品属性“${attr.join('|')}”吗?`, '提示', {type: 'warning'}).then(() => {
-        this.$http.post(api.SPECIFICATION + '/destroy',{id:row.id}, {headers: {'Content-Type': 'application/json'}}).then((data) => {
+        this.$http.post(api.SPECIFICATION + '/destroy', {id: row.id}, {headers: {'Content-Type': 'application/json'}}).then((data) => {
           if (data.code === 0) {
             this.$notify({title: '成功', message: '删除成功', type: 'success'})
             this.getGoodsSpecs()
@@ -656,16 +668,14 @@ export default {
       })
     },
     editProduct (row) {
-      console.log("row",row)
-      this.$http.get(api.SPECIFICATION + '/product?id='+row.id).then((data) => {
-          if (data.code === 0) {
+      this.$http.get(api.SPECIFICATION + '/product?id=' + row.id).then((data) => {
+        if (data.code === 0) {
             this.formSpec = data.data
             this.formSpec.listPicUrl = /^http/i.test(this.formSpec.listPicUrl) ? this.formSpec.listPicUrl : api.QiniuDomain + this.formSpec.listPicUrl
             this.productCroppa.refresh()
             this.productChanged = false
           }
         })
-      
     },
     attrDestroy (index) {
       this.form.attrs.splice(index, 1)
@@ -701,7 +711,7 @@ export default {
       })
     },
     saveCombinations () {
-      this.$refs.combinationForm.validate( async (valid) => {
+      this.$refs.combinationForm.validate(async (valid) => {
         if (valid) {
           this.loading2 = true
           this.formSpec.goodsId = this.id

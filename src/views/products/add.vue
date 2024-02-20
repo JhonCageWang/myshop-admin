@@ -52,6 +52,9 @@
                 @image-remove="onImageRemove(form.listPicUrl, 'cover')">
               </croppa>
             </el-form-item>
+            <el-form-item label="封面" prop="listPicUrl">
+              <el-input v-model="form.listPicUrl"></el-input>
+            </el-form-item>
             <el-form-item label="展示图" class="no-line-height" prop="gallery">
               <croppa v-model="imgCroppa1"
                 :width="200"
@@ -125,6 +128,9 @@
                 :options="editorOption"
                 style="height: 500px;">
               </quill-editor>
+            </el-form-item>
+            <el-form-item label="描述"    prop="goodsDesc" style="margin-top:76px">
+              <el-input v-model="form.goodsDesc"></el-input>
             </el-form-item>
             <el-form-item label="常见问题" style="margin-top: 86px;">
               <el-row v-for="(item, index) in form.faq" :key="index">
@@ -327,12 +333,6 @@ export default {
       }
       callback()
     }
-    let imageValidate = function (rule, value, callback) {
-      if (!that.imgCroppa1.hasImage() && !that.imgCroppa2.hasImage() && !that.imgCroppa3.hasImage() && !that.imgCroppa4.hasImage()) {
-        callback(new Error('请选择商品展示图'))
-      }
-      callback()
-    }
     return {
       dialogFormVisible: false,
       addSpec: {
@@ -368,11 +368,11 @@ export default {
         goodsSn: '',
         goodsNumber: '',
         retailPrice: '',
-        listPicUrl:''
+        listPicUrl: ''
       },
       initImgs: {
         cover: '',
-        product:'',
+        product: '',
         gallery: []
       },
       coverChanged: true,
@@ -396,7 +396,7 @@ export default {
       imgCroppa2: null,
       imgCroppa3: null,
       imgCroppa4: null,
-      productCroppa:null,
+      productCroppa: null,
       loading: false,
       loading2: false,
       tbloading: false,
@@ -404,9 +404,6 @@ export default {
         'goodsSn': {required: true, message: '请输入商品SKU'},
         name: {required: true, message: '请输入商品名称'},
         categories: {required: true, validator: catValidate},
-        listPicUrl: {required: true, validator: coverValidate},
-        gallery: {required: true, validator: imageValidate},
-        goodsDesc: {required: true, message: '请填写商品描述'},
         'goodsNumber': [
           {required: true, message: '请填写商品库存'},
           {type: 'number', message: '库存必须为数字值'}
@@ -650,7 +647,7 @@ export default {
         attr.push(item.value)
       })
       this.$confirm(`确定删除商品属性“${attr.join('|')}”吗?`, '提示', {type: 'warning'}).then(() => {
-        this.$http.post(api.SPECIFICATION + '/destroy',{'id':row.id}, {headers: {'Content-Type': 'application/json'}}).then((data) => {
+        this.$http.post(api.SPECIFICATION + '/destroy', {'id': row.id}, {headers: {'Content-Type': 'application/json'}}).then((data) => {
           if (data.code === 0) {
             this.$notify({title: '成功', message: '删除成功', type: 'success'})
             this.getGoodsSpecs()
@@ -692,7 +689,7 @@ export default {
       })
     },
     saveCombinations () {
-      this.$refs.combinationForm.validate( async(valid) => {
+      this.$refs.combinationForm.validate(async (valid) => {
         if (valid) {
           this.loading2 = true
           this.formSpec.goodsId = this.form.id

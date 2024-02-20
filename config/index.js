@@ -11,7 +11,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'http://127.0.0.1:8080',
+        target: 'https://www.itsforher.top',
         changeOrigin: true,
         // pathRewrite: {
         //   '^/api': ''
@@ -58,6 +58,15 @@ module.exports = {
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
+    proxyTable: {
+      '/api': {
+        target: 'https://www.itsforher.top',
+        changeOrigin: true,
+        // pathRewrite: {
+        //   '^/api': ''
+        // }
+      }
+    },
 
     /**
      * Source Maps
