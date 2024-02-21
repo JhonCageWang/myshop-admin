@@ -77,10 +77,10 @@
                   @image-remove="onBannerRemove">
                 </croppa>
               </el-form-item>
-              <el-form-item label="首页显示" v-show="catType === 0">
+            <!--   <el-form-item label="首页显示" v-show="catType === 0">
                 <el-radio class="radio" v-model="form.showIndex" :label="1">是</el-radio>
                 <el-radio class="radio" v-model="form.showIndex" :label="0">否</el-radio>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="排序">
                 <el-input-number v-model="form.sortOrder" :min="1" :max="1000"></el-input-number>
               </el-form-item>
@@ -88,8 +88,8 @@
                 <el-input-number v-model="form.showIndex" :min="1" :max="1000"></el-input-number>
               </el-form-item>
               <el-form-item label="状态">
-                <el-radio class="radio" v-model="form.isShow" :label="1">启用</el-radio>
-                <el-radio class="radio" v-model="form.isShow" :label="0">禁用</el-radio>
+                <el-radio class="radio" v-model="form.isShow" :label="0">启用</el-radio>
+                <el-radio class="radio" v-model="form.isShow" :label="1">禁用</el-radio>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="save" :loading="loading">{{ form.id ? '修改' : '新增' }}</el-button>

@@ -97,8 +97,8 @@ export default {
     },
     destroy (row) {
       this.$confirm(`确定删除品牌类型“${row.name}”吗?`, '提示', {type: 'warning'}).then(() => {
-        this.$http.post(api.BRAND + '/destory', {id: row.id}).then(data => {
-          if (data.errno === 0) {
+        this.$http.post(api.BRAND + '/delete', {id: row.id}).then(data => {
+          if (data.code === 0) {
             this.$notify({title: '成功', message: '删除成功', type: 'success'})
             this.getBrandsList()
           }

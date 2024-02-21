@@ -42,9 +42,10 @@
           </template>
         </el-table-column>
         <el-table-column prop="addTime" label="创建日期" width="170" show-overflow-tooltip></el-table-column>
-        <el-table-column label="操作" width="120" v-if="order.orderStatus === 201  || order.orderStatus === 300">
+        <el-table-column label="操作" width="240" v-if="order.orderStatus === 201  || order.orderStatus === 300">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" icon="el-icon-fa-cube" @click="dialogDelivery = true" v-if="scope.row.orderStatus === 201  || scope.row.orderStatus === 300"  >发货</el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="refound(scope.row) " v-if="scope.row.orderStatus === 201">退款</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -157,6 +158,16 @@ export default {
         this.user = data.data.user
         this.formDelivery.courierId = data.data.orderExpress.shipperId
         this.formDelivery.courierNo = data.data.orderExpress.logisticCode
+      })
+    },
+    refound (row) {
+      this.$confirm(`确定要退款吗?`, '提示', {type: 'warning'}).then(() => {
+        this.$http.post(api.ORDER + '/refund', {id: row.id}).then(data => {
+          this.$notify({title: '成功', message: '退款成功', type: 'success'})
+          this.getOrdersInfo()
+        })
+      }).catch(err => {
+        console.log(err)
       })
     },
     getCouriersList () {
