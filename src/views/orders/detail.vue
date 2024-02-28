@@ -57,7 +57,7 @@
       <el-table :data="goods" stripe border>
         <el-table-column label="图片" width="120" show-overflow-tooltip>
           <template slot-scope="scope">
-            <img width="100" height="100" :src="scope.row.list_pic_url"/>
+            <img width="100" height="100" :src="scope.row.listPicUrl"/>
           </template>
         </el-table-column>
         <el-table-column prop="goodsName" label="商品名称" min-width="150" show-overflow-tooltip></el-table-column>
@@ -172,7 +172,7 @@ export default {
     },
     getCouriersList () {
       this.$http.get(api.COURIER + '/list?page=1&size=1000').then(data => {
-        this.couriers = data.data
+        this.couriers = data.data.list
         console.log(this.couriers)
       })
     },

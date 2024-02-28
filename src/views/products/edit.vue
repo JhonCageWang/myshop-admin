@@ -83,7 +83,7 @@
                 :initial-image="initImgs.gallery[1]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[1].imgUrl, 'img2')">
+                @image-remove="onImageRemove(form.gallery[1], 'img2')">
               </croppa>
               <croppa v-model="imgCroppa3"
                 :width="200"
@@ -99,7 +99,7 @@
                 :initial-image="initImgs.gallery[2]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[2].imgUrl, 'img3')">
+                @image-remove="onImageRemove(form.gallery[2], 'img3')">
               </croppa>
               <croppa v-model="imgCroppa4"
                 :width="200"
@@ -115,7 +115,7 @@
                 :initial-image="initImgs.gallery[3]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[3].imgUrl, 'img4')">
+                @image-remove="onImageRemove(form.gallery[3], 'img4')">
               </croppa>
             </el-form-item>
             <el-form-item label="描述" class="no-line-height" prop="goodsDesc">
@@ -379,6 +379,7 @@ export default {
         gallery: []
       },
       coverChanged: false,
+      productChanged: true,
       img1Changed: false,
       img2Changed: false,
       img3Changed: false,
@@ -518,7 +519,7 @@ export default {
           this.img2Changed = true,
           this.img3Changed = true,this.img4Changed = true
         }
-        this.form.gallery = data.data.goodsGalleryList
+        this.form.gallery = this.initImgs.gallery
         
         this.coverCroppa.refresh()
         this.imgCroppa1.refresh()
@@ -593,9 +594,6 @@ export default {
       this.$message.error('图片只能是 JPG/PNG 格式！')
     },
     onImageRemove (path, type) {
-      path = path.replace(/^\/storage\//, '')
-      this.removedImgs.push(path)
-      this.removedImgs = [...new Set(this.removedImgs)]
       switch (type) {
         case 'cover':
           this.coverChanged = true
@@ -715,7 +713,7 @@ export default {
         if (valid) {
           this.loading2 = true
           this.formSpec.goodsId = this.id
-          if (this.productCroppa.hasImage() && this.coverChanged) {
+          if (this.productCroppa.hasImage() && this.productChanged) {
             const cover = await this.productCroppa.promisedBlob('image/jpeg', 1)
             const res = await utils.qupload(cover, api.GoodsImgPrefix)
             this.formSpec.listPicUrl = res.key

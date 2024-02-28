@@ -70,7 +70,7 @@
                 :initial-image="initImgs.gallery[0]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[0].imgUrl, 'img1')">
+                @image-remove="onImageRemove(form.gallery[0], 'img1')">
               </croppa>
               <croppa v-model="imgCroppa2"
                 :width="200"
@@ -86,7 +86,7 @@
                 :initial-image="initImgs.gallery[1]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[1].imgUrl, 'img2')">
+                @image-remove="onImageRemove(form.gallery[1], 'img2')">
               </croppa>
               <croppa v-model="imgCroppa3"
                 :width="200"
@@ -102,7 +102,7 @@
                 :initial-image="initImgs.gallery[2]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[2].imgUrl, 'img3')">
+                @image-remove="onImageRemove(form.gallery[2], 'img3')">
               </croppa>
               <croppa v-model="imgCroppa4"
                 :width="200"
@@ -118,7 +118,7 @@
                 :initial-image="initImgs.gallery[3]"
                 @file-size-exceed="onFileSizeExceed"
                 @file-type-mismatch="onFileTypeMismatch"
-                @image-remove="onImageRemove(form.gallery[3].imgUrl, 'img4')">
+                @image-remove="onImageRemove(form.gallery[3], 'img4')">
               </croppa>
             </el-form-item>
             <el-form-item label="描述" class="no-line-height" prop="goodsDesc">
@@ -580,9 +580,6 @@ export default {
       this.$message.error('图片只能是 JPG/PNG 格式！')
     },
     onImageRemove (path, type) {
-      path = path.replace(/^\/storage\//, '')
-      this.removedImgs.push(path)
-      this.removedImgs = [...new Set(this.removedImgs)]
       switch (type) {
         case 'cover':
           this.coverChanged = true
@@ -700,6 +697,7 @@ export default {
           }
           this.$http.post(api.SPECIFICATION + '/save', this.formSpec).then((data) => {
             if (data.code === 0) {
+              this.formSpec = {}
               this.formSpec = {
                 specArr: [{
                   selectedSpecs: null,
