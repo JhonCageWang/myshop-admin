@@ -671,7 +671,6 @@ export default {
             this.formSpec = data.data
             this.formSpec.listPicUrl = /^http/i.test(this.formSpec.listPicUrl) ? this.formSpec.listPicUrl : api.QiniuDomain + this.formSpec.listPicUrl
             this.productCroppa.refresh()
-            this.productChanged = false
           }
         })
     },

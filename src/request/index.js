@@ -20,7 +20,7 @@ axios.interceptors.request.use(function (config) {
 
 axios.interceptors.response.use(
   response => {
-    if (response.data && response.data.code === 401) {
+    if (response.data && response.data.code === 405) {
       router.replace({
         path: '/login',
         query: {redirect: router.currentRoute.fullPath}
