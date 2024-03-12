@@ -98,8 +98,8 @@
     <el-dialog
       title="发货"
       :visible.sync="dialogDelivery"
-      width="30%">
-      <el-form ref="formDelivery" :model="formDelivery" label-width="80px" size="small">
+      width="40%">
+      <!-- <el-form ref="formDelivery" :model="formDelivery" label-width="80px" size="small">
         <el-form-item label="快递" prop="courierId" :rules="{required: true, message: '请选择发货快递'}">
           <el-select v-model="formDelivery.courierId" placeholder="请选择">
             <el-option v-for="item in couriers" :key="item.id" :label="item.name" :value="item.id"></el-option>
@@ -112,7 +112,27 @@
       <span slot="footer" class="dialog-footer">
         <el-button size="small" @click="dialogDelivery = false">取 消</el-button>
         <el-button size="small" type="primary" @click="delivery" :loading="loading">提 交</el-button>
-      </span>
+      </span> -->
+      <el-table :data="formDelivery" stripe border>
+        <el-table-column  label="快递公司" width="160" show-overflow-tooltip>
+        <template slot-scope="scope">
+          <el-select v-model="scope.row.courierId" placeholder="请选择">
+            <el-option v-for="item in couriers" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </template>
+        </el-table-column>
+        <el-table-column prop="courierNo" label="快递单号" width="300" align="right" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.courierNo"></el-input>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="240" >
+          <template slot-scope="scope">
+            <el-button type="primary" size="mini" icon="el-icon-fa-cube" @click="delivery(scope.row)" >保存</el-button>
+            <el-button type="primary" size="mini" icon="el-icon-fa-cube" @click="addRow" >新增</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-dialog>
   </main-panel>
 </template>
@@ -135,10 +155,11 @@ export default {
       dialogDelivery: false,
       loading: false,
       couriers: [],
-      formDelivery: {
-        courierId: null,
-        courierNo: ''
-      }
+      formDelivery: [{
+        courierId:1,
+        courierNo:'',
+        id:null
+      }]
     }
   },
   mounted () {
@@ -146,6 +167,7 @@ export default {
     this.getOrdersInfo()
     this.getCouriersList()
   },
+  
   methods: {
     getOrdersInfo () {
       this.$http.get(api.ORDER + '/info?id=' + this.id).then(data => {
@@ -154,10 +176,20 @@ export default {
         this.orders = [data.data]
         this.goods = data.data.goodsList
         this.addresses = [data.data.address]
-        this.orderExpress = data.data.orderExpress
         this.user = data.data.user
-        this.formDelivery.courierId = data.data.orderExpress.shipperId
-        this.formDelivery.courierNo = data.data.orderExpress.logisticCode
+        // this.formDelivery.courierId = data.data.orderExpress.shipperId
+        // this.formDelivery.courierNo = data.data.orderExpress.logisticCode
+        if (data.data.orderExpressList && data.data.orderExpressList.length > 0) {
+          this.orderExpress = data.data.orderExpressList[0]
+          this.formDelivery = data.data.orderExpressList.map(r =>  {return {courierId:r.shipperId,courierNo:r.logisticCode,id:r.id}})
+        }
+      })
+    },
+    addRow() {
+      this.formDelivery.push({
+        courierId:1,
+        courierNo:'',
+        id:null
       })
     },
     refound (row) {
@@ -176,19 +208,16 @@ export default {
         console.log(this.couriers)
       })
     },
-    delivery () {
-      this.$refs.formDelivery.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$http.post(api.ORDER + '/' + this.id + '/delivery', this.formDelivery).then(data => {
-            this.$notify({title: '成功', message: '发货成功', type: 'success'})
-            this.loading = false
-            this.dialogDelivery = false
-            this.getOrdersInfo()
-          }).catch(() => {
-            this.loading = false
-          })
-        }
+    delivery (e) {
+      console.info('axiba',e)
+      this.loading = true
+      this.$http.post(api.ORDER + '/' + this.id + '/delivery', e).then(data => {
+        this.$notify({title: '成功', message: '发货成功', type: 'success'})
+        this.loading = false
+        this.dialogDelivery = false
+        this.getOrdersInfo()
+      }).catch(() => {
+        this.loading = false
       })
     },
     formatter (row, column) {
