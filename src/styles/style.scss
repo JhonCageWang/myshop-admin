@@ -37,3 +37,13 @@
 .el-form-item.no-line-height .el-form-item__content {
   line-height: unset;
 }
+
+@media (max-width: 768px) {
+  .el-table {
+    font-size: 12px; /* 调整字体大小 */
+  }
+  .el-table-column {
+    display: block; /* 让每一列在小屏幕上占据一整行 */
+    width: 100%; /* 使列宽度为100% */
+  }
+}

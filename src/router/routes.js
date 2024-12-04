@@ -106,7 +106,8 @@ const routes = [
     children: [{
       path: '',
       component: orders
-    }, {
+    }, 
+    {
       path: 'detail/:id',
       component: ordersDeail
     }]
