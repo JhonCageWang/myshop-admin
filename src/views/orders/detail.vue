@@ -97,6 +97,8 @@
         </router-link>
       </el-row>
       <el-dialog
+        v-if="!isMobile"
+        style="width: 120%;"
         title="发货"
         :visible.sync="dialogDelivery"
         >
@@ -114,7 +116,7 @@
           <el-button size="small" @click="dialogDelivery = false">取 消</el-button>
           <el-button size="small" type="primary" @click="delivery" :loading="loading">提 交</el-button>
         </span> -->
-        <el-table :data="formDelivery" stripe border>
+        <el-table :data="formDelivery" stripe border responsive="true">
           <el-table-column  label="快递公司" width="300" show-overflow-tooltip>
           <template slot-scope="scope">
             <el-select v-model="scope.row.courierId" placeholder="请选择">
@@ -135,6 +137,27 @@
           </el-table-column>
         </el-table>
       </el-dialog>
+
+      <el-dialog
+        v-if="isMobile"
+        title="发货"
+        :visible.sync="dialogDelivery"
+        >
+        <el-table :data="formDelivery" stripe border responsive="true">
+          <el-table-column  label="快递公司"  >
+          <template slot-scope="scope">
+            <el-select v-model="scope.row.courierId" placeholder="请选择" style="display: block;block;margin-top:5px">
+              <el-option v-for="item in couriers" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
+            <el-input  v-model="scope.row.courierNo" placeHolder="快递单号" style="display: block;margin-top:5px"></el-input>
+            <div style="margin-top:10px">
+              <el-button type="primary" size="mini" icon="el-icon-fa-cube" @click="delivery(scope.row)" >保存</el-button>
+              <el-button type="primary" size="mini" icon="el-icon-fa-cube" @click="addRow" >新增</el-button>
+            </div>
+          </template>
+          </el-table-column>
+        </el-table>
+      </el-dialog>
     </main-panel>
   </div>
   
@@ -142,11 +165,13 @@
 <style>
 @media (max-width: 768px) {
   .el-dialog {
-    width: 90%; /* 移动端宽度 */
+    width: 98%; /* 移动端宽度 */
     max-width: 100%; /* 最大宽度 */
     margin: 0; /* 去掉边距 */
   }
+   
 }
+
 </style>
 <script>
 import * as api from 'api'
@@ -155,6 +180,7 @@ import * as api from 'api'
 export default {
   data () {
     return {
+      isMobile:false,
       id: null,
       order: {},
       user: {},
@@ -174,6 +200,7 @@ export default {
     }
   },
   mounted () {
+    this.isMobile = window.innerWidth <= 768; 
     this.id = this.$route.params.id
     this.getOrdersInfo()
     this.getCouriersList()
